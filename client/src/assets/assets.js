@@ -102,6 +102,7 @@ export const facilityIcons = {
     "Room Service": assets.roomServiceIcon,
     "Mountain View": assets.mountainIcon,
     "Pool Access": assets.poolIcon,
+    "Moutain View": assets.mountainIcon, 
 };
 
 // For Room Details Page

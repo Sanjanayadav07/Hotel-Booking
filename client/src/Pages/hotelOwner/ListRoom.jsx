@@ -1,9 +1,49 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { roomsDummyData } from '../../assets/assets';
 import Title from '../../components/Title';
+import { useAppContext } from '../../context/AppContext';
+import toast from 'react-hot-toast';
+
 
 const ListRoom = () => {
-  const [rooms, setRooms] = useState(roomsDummyData);
+  const [rooms, setRooms] = useState([]);
+ const { axios, getToken, user , currency} = useAppContext();
+
+
+  //fetch rooms for hotels owner
+  const fetchRooms = async () => {
+    try {
+      const {data} = await axios.get('/api/rooms/owner', {
+          headers: {
+            Authorization: `Bearer ${await getToken()}`
+          }
+        })
+        if (data.success) {
+          setRooms(data.rooms)
+        }else{
+          toast.error(data.message);
+        }
+    } catch (error) {
+      toast.error(error.message)
+    } 
+  }
+//toggla - avilability
+ const toggleAvailability = async (roomId) => {
+    const {data} = await axios.post('/api/rooms/toggle-availability',{roomId}, {headers: {Authorization: `Bearer ${await getToken()}`}})
+    if (data.success) {
+      toast.success(data.message)
+      fetchRooms()
+    }else {
+      toast.error(error.message)
+
+    }
+ }
+ 
+ useEffect(()=>{
+     if (user) {
+      fetchRooms();
+     }
+ },[user])
 
   const handleToggle = (index) => {
     const updatedRooms = [...rooms];
@@ -45,7 +85,7 @@ const ListRoom = () => {
                 </td>
 
                 <td className="py-3 px-4 text-gray-700 border-t border-gray-300">
-                  ₹{item.pricePerNight}
+                  {currency}{item.pricePerNight}
                 </td>
 
                 <td className="py-3 px-4 text-sm text-center border-t border-gray-300">
@@ -55,7 +95,8 @@ const ListRoom = () => {
                       type="checkbox"
                       className="sr-only peer"
                       checked={item.isAvailable}
-                      onChange={() => handleToggle(index)}
+                     // onChange={() => handleToggle(index)}
+                     onChange={()=> toggleAvailability(item._id)}
                     />
 
                     <div className="w-12 h-7 bg-slate-300 rounded-full peer-checked:bg-blue-600 transition-all duration-200"></div>
