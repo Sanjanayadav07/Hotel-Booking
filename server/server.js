@@ -18,6 +18,7 @@ const app = express();
 app.use(
     cors({
         origin: "http://localhost:5173", // frontend URL
+         "https://quickstay-seven-ebon.vercel.app",
         credentials: true,
     })
 );
